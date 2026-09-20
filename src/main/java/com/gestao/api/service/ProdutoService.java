@@ -1,6 +1,5 @@
 package com.gestao.api.service;
 
-
 import com.gestao.api.model.Produto;
 import com.gestao.api.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
@@ -16,19 +15,78 @@ public class ProdutoService {
         this.produtoRepository = produtoRepository;
     }
 
-    public List<Produto> listarProduto() {
+    // CADASTRAR
+    public Produto cadastrar(Produto produto) {
+
+        return produtoRepository.save(produto);
+    }
+
+    // LISTAR TODOS
+    public List<Produto> listar() {
+
         return produtoRepository.findAll();
     }
 
-    public Produto buscarPorSku(String sku) {
-        return produtoRepository.findBySku(sku).orElseThrow(() -> new RuntimeException("Produto não encontrado com sku: " + sku));
+    // BUSCAR POR ID
+    public Produto buscarPorId(Long id) {
+
+        return produtoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Produto não encontrado: " + id
+                        )
+                );
     }
 
-    public List<Produto> buscarPorNome(String nome) {
-        return produtoRepository.findByNomeContainingIgnoreCase(nome);
+    // ATUALIZAR
+    public Produto atualizar(
+            Long id,
+            Produto produto
+    ) {
+
+        Produto produtoExistente =
+                produtoRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Produto não encontrado: " + id
+                                )
+                        );
+
+        produtoExistente.setSku(
+                produto.getSku()
+        );
+
+        produtoExistente.setNome(
+                produto.getNome()
+        );
+
+        produtoExistente.setDescricao(
+                produto.getDescricao()
+        );
+
+        produtoExistente.setPreco(
+                produto.getPreco()
+        );
+
+        return produtoRepository.save(
+                produtoExistente
+        );
     }
 
-    public Produto criarProduto(Produto produto) {
-        return produtoRepository.save(produto);
+    // EXCLUIR
+    public void excluir(Long id) {
+
+        Produto produto =
+                produtoRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Produto não encontrado: " + id
+                                )
+                        );
+
+        produtoRepository.delete(produto);
     }
 }

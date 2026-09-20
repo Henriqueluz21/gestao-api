@@ -1,29 +1,48 @@
 package com.gestao.api.controller;
 
-import com.gestao.api.model.Estoque;
-import com.gestao.api.model.Produto;
-import com.gestao.api.repository.ProdutoRepository;
+import com.gestao.api.dto.EstoqueCadastroDTO;
+import com.gestao.api.dto.EstoqueResponseDTO;
 import com.gestao.api.service.EstoqueService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/estoque")
 public class EstoqueController {
 
-    private final ProdutoRepository produtoRepository;
     private final EstoqueService estoqueService;
 
-    public EstoqueController( ProdutoRepository produtoRepository, EstoqueService estoqueService) {
-        this.produtoRepository = produtoRepository;
+    public EstoqueController(EstoqueService estoqueService) {
         this.estoqueService = estoqueService;
     }
 
-    @GetMapping("/{produtoId}")
-    public Estoque consultar(@PathVariable Long produtoId){
-        Produto produto = produtoRepository.findById(produtoId).orElseThrow(() -> new RuntimeException("Produto não encontrado com id: " + produtoId));
-        return estoqueService.consultarEstoque(produto);
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public EstoqueResponseDTO cadastrar(
+            @Valid @RequestBody EstoqueCadastroDTO dto
+    ) {
+        return estoqueService.cadastrar(dto);
+    }
+
+    @GetMapping
+    public List<EstoqueResponseDTO> listar() {
+        return estoqueService.listar();
+    }
+
+    @GetMapping("/{id}")
+    public EstoqueResponseDTO buscarPorId(
+            @PathVariable Long id
+    ) {
+        return estoqueService.buscarPorId(id);
+    }
+
+    @GetMapping("/produto/{produtoId}")
+    public EstoqueResponseDTO buscarPorProduto(
+            @PathVariable Long produtoId
+    ) {
+        return estoqueService.buscarPorProduto(produtoId);
     }
 }
