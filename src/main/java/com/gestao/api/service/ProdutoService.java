@@ -54,25 +54,12 @@ public class ProdutoService {
                                 )
                         );
 
-        produtoExistente.setSku(
-                produto.getSku()
-        );
+        produtoExistente.setSku(produto.getSku());
+        produtoExistente.setNome(produto.getNome());
+        produtoExistente.setDescricao(produto.getDescricao());
+        produtoExistente.setPreco(produto.getPreco());
 
-        produtoExistente.setNome(
-                produto.getNome()
-        );
-
-        produtoExistente.setDescricao(
-                produto.getDescricao()
-        );
-
-        produtoExistente.setPreco(
-                produto.getPreco()
-        );
-
-        return produtoRepository.save(
-                produtoExistente
-        );
+        return produtoRepository.save(produtoExistente);
     }
 
     // EXCLUIR
