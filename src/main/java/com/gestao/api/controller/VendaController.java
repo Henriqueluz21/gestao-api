@@ -38,4 +38,12 @@ public class VendaController {
     ) {
         return vendaService.buscarPorId(id);
     }
+    
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluir(
+            @PathVariable Long id
+    ) {
+        vendaService.excluir(id);
+    }
 }

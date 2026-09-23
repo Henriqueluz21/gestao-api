@@ -1,8 +1,10 @@
 package com.gestao.api.service;
 
 import com.gestao.api.model.Produto;
+import com.gestao.api.repository.EstoqueRepository;
 import com.gestao.api.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -10,26 +12,28 @@ import java.util.List;
 public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
+    private final EstoqueRepository estoqueRepository;
 
-    public ProdutoService(ProdutoRepository produtoRepository) {
+    public ProdutoService(
+            ProdutoRepository produtoRepository,
+            EstoqueRepository estoqueRepository
+    ) {
         this.produtoRepository = produtoRepository;
+        this.estoqueRepository = estoqueRepository;
     }
 
     // CADASTRAR
     public Produto cadastrar(Produto produto) {
-
         return produtoRepository.save(produto);
     }
 
     // LISTAR TODOS
     public List<Produto> listar() {
-
         return produtoRepository.findAll();
     }
 
     // BUSCAR POR ID
     public Produto buscarPorId(Long id) {
-
         return produtoRepository
                 .findById(id)
                 .orElseThrow(() ->
@@ -63,6 +67,7 @@ public class ProdutoService {
     }
 
     // EXCLUIR
+    @Transactional
     public void excluir(Long id) {
 
         Produto produto =
@@ -73,6 +78,8 @@ public class ProdutoService {
                                         "Produto não encontrado: " + id
                                 )
                         );
+
+        estoqueRepository.deleteByProduto(produto);
 
         produtoRepository.delete(produto);
     }

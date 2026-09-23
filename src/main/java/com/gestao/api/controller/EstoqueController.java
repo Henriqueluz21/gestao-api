@@ -45,4 +45,20 @@ public class EstoqueController {
     ) {
         return estoqueService.buscarPorProduto(produtoId);
     }
+
+    @PutMapping("/{id}")
+    public EstoqueResponseDTO atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody EstoqueCadastroDTO dto
+    ) {
+        return estoqueService.atualizar(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluir(
+            @PathVariable Long id
+    ) {
+        estoqueService.excluir(id);
+    }
 }

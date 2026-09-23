@@ -38,6 +38,39 @@ public class VendaService {
     }
 
     @Transactional
+    public void excluir(Long id) {
+
+        Venda venda = vendaRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Venda não encontrada: " + id
+                        )
+                );
+
+        for (ItemVenda item : venda.getItens()) {
+
+            Produto produto = item.getProduto();
+
+            Estoque estoque = estoqueRepository
+                    .findByProduto(produto)
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "Estoque não encontrado para o produto: "
+                                            + produto.getNome()
+                            )
+                    );
+
+            estoque.setQuantidade(
+                    estoque.getQuantidade()
+                            + item.getQuantidade()
+            );
+            estoqueRepository.save(estoque);
+        }
+        vendaRepository.delete(venda);
+    }
+
+    @Transactional
     public VendaResponseDTO cadastrar(VendaCadastroDTO dto) {
 
         Venda venda = new Venda();
@@ -104,20 +137,16 @@ public class VendaService {
 
             estoqueRepository.save(estoque);
 
-            // 9. Adiciona o item à lista da venda
             itens.add(item);
         }
 
-        // 10. Coloca os itens na venda
         venda.setItens(itens);
 
-        // 11. Define o valor total
         venda.setValorTotal(valorTotal);
 
         // 12. Salva a venda
         Venda vendaSalva = vendaRepository.save(venda);
 
-        // 13. Converte para DTO de resposta
         return converterParaDTO(vendaSalva);
     }
 

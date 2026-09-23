@@ -39,12 +39,10 @@ public class EstoqueService {
                         )
                 );
 
-        // 2. Verifica se já existe estoque para esse produto
         Estoque estoque = estoqueRepository
                 .findByProduto(produto)
                 .orElse(null);
 
-        // 3. Se já existe, adiciona a quantidade
         if (estoque != null) {
 
             estoque.setQuantidade(
@@ -54,19 +52,62 @@ public class EstoqueService {
 
         } else {
 
-            // 4. Se não existe, cria um novo estoque
             estoque = new Estoque();
 
             estoque.setProduto(produto);
             estoque.setQuantidade(dto.getQuantidade());
         }
 
-        // 5. Salva
         Estoque estoqueSalvo =
                 estoqueRepository.save(estoque);
 
-        // 6. Retorna DTO
         return converterParaDTO(estoqueSalvo);
+    }
+
+    @Transactional
+    public EstoqueResponseDTO atualizar(
+            Long id,
+            EstoqueCadastroDTO dto
+    ) {
+
+        Estoque estoque = estoqueRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Estoque não encontrado: " + id
+                        )
+                );
+
+        Produto produto = produtoRepository
+                .findById(dto.getProdutoId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Produto não encontrado: "
+                                        + dto.getProdutoId()
+                        )
+                );
+
+        estoque.setProduto(produto);
+        estoque.setQuantidade(dto.getQuantidade());
+
+        Estoque estoqueAtualizado =
+                estoqueRepository.save(estoque);
+
+        return converterParaDTO(estoqueAtualizado);
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+
+        Estoque estoque = estoqueRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Estoque não encontrado: " + id
+                        )
+                );
+
+        estoqueRepository.delete(estoque);
     }
 
     public List<EstoqueResponseDTO> listar() {
